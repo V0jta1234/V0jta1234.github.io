@@ -168,7 +168,8 @@ let outputDiv, textSpan, cursorSpan, fullOutput;
 var HAZMASuit = false; // Globální proměnná pro stav HAZMAT obleku
 var ownBadgeNuclearClearance = false;
 var badgeWithNuclearClearance = false;
-
+var chanceToNuclearChief = -1;
+var wentToMainBrige = false;
 function gameStart() {
     const startButton = document.getElementById("startButton");
     outputDiv = document.getElementById("output"); 
@@ -499,7 +500,9 @@ function gameStart() {
         }
     }
     function MainReactorPath_ControlPanelWheretoGoMainBrige_04(){
-        typeLine("On your way to the main brige you find traces of a fight that took place here.",()=>{
+        if(!wentToMainBrige)
+        {
+            typeLine("On your way to the main brige you find traces of a fight that took place here.",()=>{
             typeLine("You see dead bodys of Ark's security teams and dead bodys with unknow symbols on their armor.",()=>{
                 typeLine("As you come to the entrance to the main brige you find the door sealed.",()=>{
                     typeLine("When you look thrue them you see the main brige was completly destroyed by the explosion. There is nothing left.",()=>{
@@ -508,9 +511,45 @@ function gameStart() {
                 });
             });
         });
+        }
+        else{
+            typeLine("WIP");
+        }
     }
     function MainReactorPath_MainBrigeBack_04(){
-        
+        if(chanceToNuclearChief==-1)
+        {
+            chanceToMeetNuclearChiefF();
+        }
+        else if(chanceToNuclearChief==1)
+        {
+            typeLine("On your way back you find a body of a nuclear chief",()=>{
+                typeLine("You quicly loot his body and find a nuclear reactor badge.",()=>{
+                    badgeWithNuclearClearance = true;
+                    typeLine("You run back and enter the main nuclear reactor control room.",()=>{
+                        MainReactorPath_ControlRoom_05();
+                    });
+                });
+            });
+        }
+        else if(chanceToMeetNuclearChief ==0)
+        {
+            typeLine("You return to the control panel. What will you do?",()=>{
+                MainReactorPath_ControlPanelWheretoGo_04();
+            })
+        }
+    }
+    function chanceToMeetNuclearChiefF(){
+        let chance = Marh.floor(Math.random()*10);
+        if(chance>=5)
+        {
+            chanceToNuclearChief = 0;
+        }
+        else
+        {
+            chanceToNuclearChief = 1;
+        }
+        MainReactorPath_MainBrigeBack_04();
     }
     function MainReactorPath_ControlRoom_05(){
 
