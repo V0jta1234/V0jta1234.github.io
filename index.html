@@ -170,6 +170,7 @@ var ownBadgeNuclearClearance = false;
 var badgeWithNuclearClearance = false;
 var chanceToNuclearChief = -1;
 var wentToMainBrige = false;
+var meltdownimminent = true;
 function gameStart() {
     const startButton = document.getElementById("startButton");
     outputDiv = document.getElementById("output"); 
@@ -551,8 +552,103 @@ function gameStart() {
         }
         MainReactorPath_MainBrigeBack_04();
     }
-    function MainReactorPath_ControlRoom_05(){
+    function MainReactorPath_ControlPanelWheretoGoSecBrige_04(){
+        typeLine("You run to the second brige and find it in chaos.",()=>{
+            typeLine("Chief Mate:Are you comming from the main reactor? Did you stop the meltdown?",()=>{
+                typeLine("What will you say?:",()=>{
+                    MainReactorPath_SecondBrigeSave();
+                }); 
+            });
+        });
+    }
+    function MainReactorPath_SecondBrigeSave(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
 
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesHazmat'; // Může být i 'choicesContainer', pokud nechcete specifické styly
+        if(!meltdownimminent)
+        {
+        const options = [
+            {
+                text: "1.No, I do not have proper clearance",
+                action: function() {
+                    typeLine("Chief Mate:No problem.\nHe reaches over and gives you a badge. You waste no time and rush to the control room",()=>{
+                        MainReactorPath_ControlRoom_05();
+                    })
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            },
+            {
+                text: "3.Yes, I did",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            }
+        ];
+        }
+        else{
+            const options = [
+            {
+                text: "1.No, I do not have proper clearance",
+                action: function() {
+                    typeLine("Chief Mate:No problem.\nHe reaches over and gives you a badge. You waste no time and rush to the control room",()=>{
+                        MainReactorPath_ControlRoom_05();
+                    })
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            },
+        ];
+        }
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+    function MainReactorPath_getShot(){
+        typeLine("Before you even finished the sentance you got shot.",()=>{
+            typeLine("GAME OVER:Was it really a great idea?",()=>{
+                gameOver();
+            })
+        })
+    }
+    function MainReactorPath_ControlRoom_05(){
+        typeLine("When you enter the control room a heat wave hits you and you feel it thrue the HAZMA suit.",()=>{
+            typeLine("You have to drop the emergency bars")
+        })
+    }
+    function gameOver()
+    {
+        typeLine("\nPress any key to restart...", () => {
+                            const restartListener = () => {
+                                document.removeEventListener("keydown", restartListener);
+                                window.location.reload();
+                            };
+                            document.addEventListener("keydown", restartListener);
+                        });
     }
     function MainReactorPath_NoSuit_02() {
         typeLine("The radiation is becoming unbearable. Each breath is a struggle. Your limbs feel heavy.", () => {
