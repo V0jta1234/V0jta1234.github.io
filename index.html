@@ -633,7 +633,7 @@ function gameStart() {
     function MainReactorPath_ControlRoom_05() {
     typeLine("You enter the control room. The radiation levels are high, but manageable with the suit.", () => {
         typeLine("The central console is active, awaiting input. Stop the reactor using the emergency rods.", () => {
-            typeLine("The system asks for a 3-digit override code. You have only 3 attempts.", () => {
+            typeLine("The system asks for a 3-digit override code. You have only 3 attempts.\nYou look around the room and find a half burned piece of paper.\nOn it there are three numbers. The first one is clearly a 7 but the other two are unreadable.\nThe second is either 2 or 8 nad the third is either 6 or 8.\nYou look again around the room and find number 2 sprayed on the chair.", () => {
                 startReactorPuzzle();
             });
         });
