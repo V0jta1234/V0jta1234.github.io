@@ -632,7 +632,7 @@ function gameStart() {
     }
     function MainReactorPath_ControlRoom_05() {
     typeLine("You enter the control room. The radiation levels are high, but manageable with the suit.", () => {
-        typeLine("The central console is active, awaiting input. You must reroute the reactor flow to prevent meltdown.", () => {
+        typeLine("The central console is active, awaiting input. Stop the reactor using the emergency rods.", () => {
             typeLine("The system asks for a 3-digit override code. You have only 3 attempts.", () => {
                 startReactorPuzzle();
             });
@@ -673,9 +673,10 @@ function startReactorPuzzle() {
             const userCode = inputField.value;
             outputDiv.removeChild(inputContainer);
             if (userCode === correctCode) {
-                typeLine("Code accepted. Reactor flow successfully rerouted. Meltdown prevented!", () => {
+                typeLine("Code accepted. Emergency rods deployed. Reactor shutdown.", () => {
                     meltdownimminent = false;
-                    // Pokračuj na další část hry
+                    MainReactorPath_ReturnToSecondBrige_05();
+                    
                 });
             } else {
                 attemptsLeft--;
@@ -683,7 +684,9 @@ function startReactorPuzzle() {
                     typeLine(`Incorrect code. Attempts left: ${attemptsLeft}`, askForCode);
                 } else {
                     typeLine("All attempts used. Reactor lockdown engaged. Critical failure imminent.", () => {
-                        // Zde můžeš vést k neúspěšné větvi nebo game over
+                        typeLine("GAME OVER:Nuclear explosion shreded Ark to pieces. Better luck next time",()=>{
+                            gameOver()
+                        });
                     });
                 }
             }
@@ -692,7 +695,53 @@ function startReactorPuzzle() {
 
     askForCode();
 }
+    function MainReactorPath_ReturnToSecondBrige_05(){
+        typeLine("You run to the second brige. It's still in chaos.",()=>{
+            typeLine("Chief Mate:Did you stop the meltdow??",()=>{
+                typeLine("What will you say?:",()=>{
+                    MainReactorPath_ReturnToSecondBrigeChose_05();
+                });
+            });
+        });
+    }
+    function MainReactorPath_ReturnToSecondBrigeChose_05(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
 
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choice-option';
+        const options = [
+            {
+                text: "3.Yes, I did",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            }
+        ]    
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }    
     function gameOver()
     {
         typeLine("\nPress any key to restart...", () => {
