@@ -519,7 +519,7 @@ function gameStart() {
     }
     function chanceToMeetNuclearChiefF(){
      let chance = Math.floor(Math.random()*10);
-     if(chance>=3)
+     if(chance>1)
      {
          chanceToNuclearChief = 0;
      }
@@ -562,13 +562,25 @@ function gameStart() {
             });
         });
     }
+    function MainReactorPath_END(){
+        if(meltdownimminent)
+        {
+            typeLine("Chief Mate: You are telling a lie. Shot him.",()=>{
+                typeLine("GAME OVER:You got shot. They didn't know if you were leing or halucinating.",()=>{
+                    gameOver();
+                });
+            });
+        }
+        else{
+            typeLine("Chief Mate: Great job.",()=>{
+            });
+        }
+    }
     function MainReactorPath_SecondBrigeSave(){
         if (cursorSpan) cursorSpan.style.display = 'none';
 
         const choicesContainer = document.createElement('div');
         choicesContainer.id = 'choice-option';
-        if(!meltdownimminent)
-        {
         const options = [
             {
                 text: "1.No, I do not have proper clearance",
@@ -591,25 +603,6 @@ function gameStart() {
                 }
             }
         ];
-        }
-        else{
-            const options = [
-            {
-                text: "1.No, I do not have proper clearance",
-                action: function() {
-                    typeLine("Chief Mate:No problem.\nHe reaches over and gives you a badge. You waste no time and rush to the control room",()=>{
-                        MainReactorPath_ControlRoom_05();
-                    })
-                }
-            },
-            {
-                text: "2.EVERYBODY HANDS UP!",
-                action: function() {
-                    MainReactorPath_getShot();
-                }
-            },
-        ];
-        }
         options.forEach(opt => {
             const choiceElement = document.createElement('div');
             choiceElement.textContent = opt.text;
@@ -629,6 +622,7 @@ function gameStart() {
         });
         outputDiv.appendChild(choicesContainer);
     }
+
     function MainReactorPath_getShot(){
         typeLine("Before you even finished the sentance you got shot.",()=>{
             typeLine("GAME OVER:Was it really a great idea?",()=>{
