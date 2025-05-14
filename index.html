@@ -532,28 +532,27 @@ function gameStart() {
  }
 
  function MainReactorPath_MainBrigeBack_04(){
-    alert("here we are");
-     if(chanceToNuclearChief==-1)
-     {
-         chanceToMeetNuclearChiefF();
-     }
-     else if(chanceToNuclearChief==1)
-     {
-         typeLine("On your way back you find a body of a nuclear chief",()=>{
-             typeLine("You quicly loot his body and find a nuclear reactor badge.",()=>{
-                 badgeWithNuclearClearance = true;
-                 typeLine("You run back and enter the main nuclear reactor control room.",()=>{
-                     MainReactorPath_ControlRoom_05();
-                 });
-             });
-         });
-     }
-     else if(chanceToMeetNuclearChief ==0)
-     {
-         typeLine("You return to the control panel. What will you do?",()=>{
-             MainReactorPath_ControlPanelWheretoGo_04();
-         })
-     }
+    if(chanceToNuclearChief==-1)
+    {
+        chanceToMeetNuclearChiefF();
+    }
+    else if(chanceToNuclearChief==1)
+    {
+        typeLine("On your way back you find a body of a nuclear chief",()=>{
+            typeLine("You quicly loot his body and find a nuclear reactor badge.",()=>{
+                badgeWithNuclearClearance = true;
+                typeLine("You run back and enter the main nuclear reactor control room.",()=>{
+                    MainReactorPath_ControlRoom_05();
+                });
+            });
+        });
+    }
+    else if(chanceToMeetNuclearChief ==0)
+    {
+        typeLine("You return to the control panel. What will you do?",()=>{
+            MainReactorPath_ControlPanelWheretoGo_04();
+        });
+    }
  }
     function MainReactorPath_ControlPanelWheretoGoSecBrige_04(){
         typeLine("You run to the second brige and find it in chaos.",()=>{
