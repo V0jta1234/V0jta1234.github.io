@@ -566,7 +566,7 @@ function gameStart() {
         if(meltdownimminent)
         {
             typeLine("Chief Mate: You are telling a lie. Shot him.",()=>{
-                typeLine("GAME OVER:You got shot. They didn't know if you were leing or halucinating.",()=>{
+                typeLine("GAME OVER:You got shot. They didn't know if you were lying or halucinating.",()=>{
                     gameOver();
                 });
             });
@@ -630,11 +630,69 @@ function gameStart() {
             })
         })
     }
-    function MainReactorPath_ControlRoom_05(){
-        typeLine("When you enter the control room a heat wave hits you and you feel it thrue the HAZMA suit.",()=>{
-            typeLine("You have to drop the emergency bars")
-        })
+    function MainReactorPath_ControlRoom_05() {
+    typeLine("You enter the control room. The radiation levels are high, but manageable with the suit.", () => {
+        typeLine("The central console is active, awaiting input. You must reroute the reactor flow to prevent meltdown.", () => {
+            typeLine("The system asks for a 3-digit override code. You have only 3 attempts.", () => {
+                startReactorPuzzle();
+            });
+        });
+    });
+}
+
+function startReactorPuzzle() {
+    const correctCode = "726";
+    let attemptsLeft = 3;
+
+    function askForCode() {
+        const inputContainer = document.createElement("div");
+        inputContainer.id = "codeInputContainer";
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.maxLength = 3;
+        inputField.placeholder = "Enter 3-digit code";
+        inputField.style.backgroundColor = "black";
+        inputField.style.color = "rgb(0, 255, 0)";
+        inputField.style.border = "1px solid rgb(0, 255, 0)";
+        inputField.style.fontFamily = '"Consolas", monospace';
+        inputField.style.fontSize = "16px";
+        inputField.style.padding = "5px";
+        inputField.style.marginTop = "10px";
+
+        const submitButton = document.createElement("button");
+        submitButton.textContent = "Submit";
+        submitButton.className = "startButton";
+        submitButton.style.marginLeft = "10px";
+
+        inputContainer.appendChild(inputField);
+        inputContainer.appendChild(submitButton);
+        outputDiv.appendChild(inputContainer);
+
+        submitButton.onclick = () => {
+            const userCode = inputField.value;
+            outputDiv.removeChild(inputContainer);
+            if (userCode === correctCode) {
+                typeLine("Code accepted. Reactor flow successfully rerouted. Meltdown prevented!", () => {
+                    meltdownimminent = false;
+                    // Pokračuj na další část hry
+                });
+            } else {
+                attemptsLeft--;
+                if (attemptsLeft > 0) {
+                    typeLine(`Incorrect code. Attempts left: ${attemptsLeft}`, askForCode);
+                } else {
+                    typeLine("All attempts used. Reactor lockdown engaged. Critical failure imminent.", () => {
+                        // Zde můžeš vést k neúspěšné větvi nebo game over
+                    });
+                }
+            }
+        };
     }
+
+    askForCode();
+}
+
     function gameOver()
     {
         typeLine("\nPress any key to restart...", () => {
