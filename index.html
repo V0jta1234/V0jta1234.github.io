@@ -517,41 +517,43 @@ function gameStart() {
             typeLine("WIP");
         }
     }
-    function MainReactorPath_MainBrigeBack_04(){
-        if(chanceToNuclearChief==-1)
-        {
-            chanceToMeetNuclearChiefF();
-        }
-        else if(chanceToNuclearChief==1)
-        {
-            typeLine("On your way back you find a body of a nuclear chief",()=>{
-                typeLine("You quicly loot his body and find a nuclear reactor badge.",()=>{
-                    badgeWithNuclearClearance = true;
-                    typeLine("You run back and enter the main nuclear reactor control room.",()=>{
-                        MainReactorPath_ControlRoom_05();
-                    });
-                });
-            });
-        }
-        else if(chanceToMeetNuclearChief ==0)
-        {
-            typeLine("You return to the control panel. What will you do?",()=>{
-                MainReactorPath_ControlPanelWheretoGo_04();
-            })
-        }
-    }
     function chanceToMeetNuclearChiefF(){
-        let chance = Math.floor(Math.random()*10);
-        if(chance>=5)
-        {
-            chanceToNuclearChief = 0;
-        }
-        else
-        {
-            chanceToNuclearChief = 1;
-        }
-        MainReactorPath_MainBrigeBack_04();
-    }
+     let chance = Math.floor(Math.random()*10);
+     if(chance>=5)
+     {
+         chanceToNuclearChief = 0;
+     }
+     else
+     {
+         chanceToNuclearChief = 1;
+     }
+     // Už nevoláme MainReactorPath_MainBrigeBack_04() tady,
+     // protože už jsme v této funkci.
+ }
+
+ function MainReactorPath_MainBrigeBack_04(){
+     if(chanceToNuclearChief==-1)
+     {
+         chanceToMeetNuclearChiefF();
+     }
+     else if(chanceToNuclearChief==1)
+     {
+         typeLine("On your way back you find a body of a nuclear chief",()=>{
+             typeLine("You quicly loot his body and find a nuclear reactor badge.",()=>{
+                 badgeWithNuclearClearance = true;
+                 typeLine("You run back and enter the main nuclear reactor control room.",()=>{
+                     MainReactorPath_ControlRoom_05();
+                 });
+             });
+         });
+     }
+     else if(chanceToMeetNuclearChief ==0)
+     {
+         typeLine("You return to the control panel. What will you do?",()=>{
+             MainReactorPath_ControlPanelWheretoGo_04();
+         })
+     }
+ }
     function MainReactorPath_ControlPanelWheretoGoSecBrige_04(){
         typeLine("You run to the second brige and find it in chaos.",()=>{
             typeLine("Chief Mate:Are you comming from the main reactor? Did you stop the meltdown?",()=>{
