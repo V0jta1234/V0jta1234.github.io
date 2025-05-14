@@ -396,7 +396,7 @@ function gameStart() {
 
     function handleHazmatChoice(tookSuit) {
         if (tookSuit) {
-            typeLine("You quickly don the HAZMAT suit. It feels cumbersome but offers a sense of security against the invisible threat of radiation.", () => { proceedToReactorRoom();
+            typeLine("You quickly take the HAZMAT suit. It feels cumbersome but offers a sense of security against the invisible threat of radiation.", () => { proceedToReactorRoom();
             });
         } else {
             typeLine("You decide to leave the suit. It might be contaminated, or perhaps speed is more important.", () => {
@@ -532,6 +532,7 @@ function gameStart() {
  }
 
  function MainReactorPath_MainBrigeBack_04(){
+    alert("here we are");
      if(chanceToNuclearChief==-1)
      {
          chanceToMeetNuclearChiefF();
