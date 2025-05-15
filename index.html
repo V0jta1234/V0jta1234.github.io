@@ -171,6 +171,9 @@ var badgeWithNuclearClearance = false;
 var chanceToNuclearChief = -1;
 var wentToMainBrige = false;
 var meltdownimminent = true;
+var weaponRoomBadge = false;
+var oxygenUp = false;
+var waterUp = false;
 function gameStart() {
     const startButton = document.getElementById("startButton");
     outputDiv = document.getElementById("output"); 
@@ -514,7 +517,9 @@ function gameStart() {
         });
         }
         else{
-            typeLine("WIP");
+            typeLine("There is nothing new there.\nWhat will you do?",()=>{
+                MainReactorPath_ControlPanelWheretoGO_04();
+            });
         }
     }
     function chanceToMeetNuclearChiefF(){
@@ -572,9 +577,65 @@ function gameStart() {
             });
         }
         else if(!meltdownimminent){
-            typeLine("Chief Mate: Great job.",()=>{
+            typeLine("Chief Mate: Great job. Here is something for your trouble.",()=>{
+                typeLine("You reacive a weapon's room badge.",()=>{
+                    weaponRoomBadge = true;
+                    if(oxygenUp && waterUp)
+                    {
+                        gameEnd();
+                    }
+                    else if(!oxygenUp && !waterUp)
+                    {
+                        typeLine("Where will you go next?",()=>{
+                            whereToGoNuclearBoth();
+                        });
+                    }
+                    else if(!oxygenUp && waterUp)
+                    {
+                        pathOxygenCenter();
+                    }
+                    else if(oxygenUp && !waterUp)
+                    {
+                        pathWaterCenter();
+                    }
+                });
             });
         }
+    }
+    function whereToGoNuclearBoth(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesContainer';
+
+        const options = [
+            { text: "1. Oxygen Recuperation Center", action: pathOxygenCenter, pathName: "Oxygen Recuperation Center" },
+            { text: "2. Water Recuperation Center", action: pathWaterCenter, pathName: "Water Recuperation Center" }
+        ];
+
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option';
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";           
+                opt.action(); 
+                if (onPathChosenCallback) onPathChosenCallback(opt.pathName);
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+    }
+    function gameEnd(){
+        typeLine("WIP",()=>{
+
+        });
     }
     function MainReactorPath_SecondBrigeSave(){
         if (cursorSpan) cursorSpan.style.display = 'none';
@@ -847,7 +908,7 @@ function startReactorPuzzle() {
             });
         });
     });
-}
+
 </script>
 </head>
 <body>
