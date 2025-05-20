@@ -772,7 +772,7 @@ function startReactorPuzzle() {
         choicesContainer.id = 'choice-option';
         const options = [
             {
-                text: "3.Yes, I did",
+                text: "1.Yes, I did",
                 action: function() {
                     MainReactorPath_END();
                 }
@@ -857,7 +857,7 @@ function startReactorPuzzle() {
             typeLine("You've chosen to go to the Water Recuperation Center.", () => {
                 typeLine("The sound of rushing water and steam fills the corridor. The floor is slick.", () => {
                     // Logika pro Water Center
-                    typeLine("TO BE CONTINUED: Water Recuperation Center...", () => {});
+                    typeLine("", () => {});
                 });
             });
         });
