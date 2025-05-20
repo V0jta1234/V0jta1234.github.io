@@ -174,6 +174,7 @@ var meltdownimminent = true;
 var weaponRoomBadge = false;
 var oxygenUp = false;
 var waterUp = false;
+var weapon = false;
 function gameStart() {
     const startButton = document.getElementById("startButton");
     outputDiv = document.getElementById("output"); 
@@ -857,10 +858,26 @@ function startReactorPuzzle() {
             typeLine("You've chosen to go to the Water Recuperation Center.", () => {
                 typeLine("The sound of rushing water and steam fills the corridor. The floor is slick.", () => {
                     // Logika pro Water Center
-                    typeLine("", () => {});
+                    if(weaponRoomBadge)
+                    {
+                        typeLine("As you run to Water Recuperation center. You see a weapon room. You are lucky and have the badge.\nWhen you inside you find one pistol.\nIt's P-150C. You take it and a second magazine just in case.",()=>{
+                        weapon =true;
+                        pathWaterCenter_01();
+                        });
+                    }
+                    else
+                    {
+                        pathWaterCenter_01();
+                    }
                 });
             });
         });
+    }
+
+    function pathWaterCenter_01{
+            typeLine("",()=>{
+
+            });
     }
 
     function whereToGoComputerRoom(callback) {
