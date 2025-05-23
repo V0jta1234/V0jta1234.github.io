@@ -874,18 +874,78 @@ function startReactorPuzzle() {
         });
     }
 
-    /*function pathWaterCenter_01{
-            typeLine("",()=>{
-
+    function pathWaterCenter_01() {
+            typeLine("When you run there, you notice the air is cooler and more humid.",()=>{
+                typeLine("The sound of rushing water grows louder as you approach the center.",()=>{
+                    typeLine("You arrive at the Water Recuperation Center. It's dimly lit, with large tanks filled with water.",()=>{
+                        typeLine("You look around and find the control panel of the recuperation system.",()=>{
+                            typeLine("You find that there is no water coming in and there is a on 1/3 of the power.",()=>{
+                                typeLine("You need to find a way to restore the water recuperation system.",()=>{
+                                    updateTaskLogOverlay([
+                                        "Investigate main reactor meltdown potential solutions.",
+                                        "Restore oxygen recuperation system functionality.",
+                                        "Restore water recuperation system functionality:",
+                                        "\t1.Restore water flow.",
+                                        "\t2.Restore power to the system.",
+                                        "Investigate the cause of the explosion."
+                                    ]);
+                                    typeLine("What will you do?",()=>{
+                                        pathWaterCenter_Decision_02();
+                                    })
+                                });
+                            });
+                            
+                        });
+                    });
+                });
             });
-    }*/
+    }
+
+    function pathWaterCenter_Decision_02(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choice-option';
+        const options = [
+            {
+                text: "1.Yes, I did",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            }
+        ]    
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);  
+    }
 
     function whereToGoComputerRoom(callback) {
         typeLine("\nSYSTEM: You are in the Computer Room. Main navigation online.", () => { 
             typeLine("Corridors branch out from here. Available routes:", () => { // Upravený text
                 displayComputerRoomChoices(callback);
             });
-        });
+        }); 
     }
     // --- KONEC DEFINIC FUNKCÍ ---
 
