@@ -908,13 +908,13 @@ function startReactorPuzzle() {
         choicesContainer.id = 'choice-option';
         const options = [
             {
-                text: "1.Yes, I did",
+                text: "1.Look for a way to restore water flow.",
                 action: function() {
                     MainReactorPath_END();
                 }
             },
             {
-                text: "2.EVERYBODY HANDS UP!",
+                text: "2.Look for a way to restore power.",
                 action: function() {
                     MainReactorPath_getShot();
                 }
@@ -938,6 +938,14 @@ function startReactorPuzzle() {
             choicesContainer.appendChild(choiceElement);
         });
         outputDiv.appendChild(choicesContainer);  
+    }
+
+    function pathWaterCenter_Water_03(){
+        
+    }
+
+    function pathWaterCenter_Power_03(){
+
     }
 
     function whereToGoComputerRoom(callback) {
