@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="https://media.istockphoto.com/id/1136778932/photo/green-code-in-command-line-interface-cli-unix-bash-shell.jpg?s=612x612&w=0&k=20&c=Puukrw4AvRW5eSyxRjWEXBXIjWsfdGNQTD8K2RmJ_KY=">
+    <title>Konzolová hra</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            background-color: black;
+            color: rgb(0, 255, 0);
+            font-family: "Consolas", "Lucida Console", monospace;
+            overflow: hidden;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .startButton {
+            border-color: rgb(0, 255, 0);
+            color: rgb(0, 255, 0);
+            background-color: black;
+            font-size: 20px;
+            border-radius: 5px;
+            padding: 15px 30px;
+            cursor: pointer;
+            border: 2px solid rgb(0, 255, 0);
+        }
+
+        .startButton:hover {
+            background-color: rgb(0, 255, 0);
+            color: black;
+        }
+
+        #output {
+            padding: 20px;
+            display: none;
+            opacity: 1;
+        }
+
+        @keyframes blink-animation {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        .blinking {
+          color: rgb(0, 255, 0);
+          animation: blink-animation 0.8s steps(2, start) infinite;
+        }
+
+        #taskLogButton {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background-color: black;
+            color: rgb(0, 255, 0);
+            border: 2px solid rgb(0, 255, 0);
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: "Consolas", "Lucida Console", monospace;
+            font-size: 16px;
+            z-index: 1000;
+        }
+
+        #taskLogButton:hover {
+            background-color: rgb(0, 255, 0);
+            color: black;
+        }
+
+        #taskOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            color: rgb(0, 255, 0);
+            font-family: "Consolas", "Lucida Console", monospace;
+        }
+
+        #taskOverlayContent {
+            background-color: black;
+            padding: 25px;
+            border: 2px solid rgb(0, 255, 0);
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            min-height: 200px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #taskOverlayClose {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: rgb(0, 255, 0);
+            cursor: pointer;
+            border: none;
+            background: none;
+            line-height: 1;
+        }
+
+        #taskOverlayClose:hover {
+            color: white;
+        }
+
+        #taskOverlayContent h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgb(0, 255, 0);
+            padding-bottom: 10px;
+        }
+
+        #taskOverlayContent ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #taskOverlayContent ul li {
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(0, 255, 0, 0.4);
+        }
+
+        #taskOverlayContent ul li:last-child {
+            border-bottom: none;
+        }
+
+        /* STYLY PRO KLIKATELNÉ VOLBY */
+        .choice-option {
+            display: block;
+            margin: 10px 0; /* Větší odsazení mezi volbami */
+            padding: 8px;
+            cursor: pointer;
+            border: 1px solid transparent; /* Placeholder pro hover efekt */
+            transition: background-color 0.3s ease, border-color 0.3s ease; /* Plynulý přechod */
+        }
+
+        .choice-option:hover {
+            border: 1px solid rgb(0, 255, 0);
+            background-color: rgba(0, 255, 0, 0.15); /* Výraznější hover */
+            color: white; /* Změna barvy textu při hoveru */
+        }
+
+        #choicesContainer {
+            margin-top: 15px; /* Odsazení kontejneru voleb od předchozího textu */
+        }
+
+    </style>
+    <script>
+        // Globální proměnné přístupné v gameStart a vnořených funkcích
+let outputDiv, textSpan, cursorSpan, fullOutput;
+var HAZMASuit = false; // Globální proměnná pro stav HAZMAT obleku
+var ownBadgeNuclearClearance = false;
+var badgeWithNuclearClearance = false;
+var chanceToNuclearChief = -1;
+var wentToMainBrige = false;
+var meltdownimminent = true;
+var weaponRoomBadge = false;
+var oxygenUp = false;
+var waterUp = false;
+var weapon = false;
+function gameStart() {
+    const startButton = document.getElementById("startButton");
+    outputDiv = document.getElementById("output"); 
+
+    startButton.style.display = "none";
+    document.querySelector('.center').style.display = "none";
+    outputDiv.style.display = "block";
+
+    textSpan = document.createElement("span");
+    textSpan.style.whiteSpace = "pre-wrap";
+
+    cursorSpan = document.createElement("span");
+    cursorSpan.className = "blinking";
+    cursorSpan.textContent = "_";
+
+    outputDiv.innerHTML = '';
+    outputDiv.appendChild(textSpan);
+    outputDiv.appendChild(cursorSpan);
+
+    fullOutput = "";
+
+    // --- VŠECHNY DEFINICE FUNKCÍ ---
+    function typeLine(line, callback) {
+        let charIndex = 0;
+        let currentLineText = "";
+        function typeChar() {
+            if (charIndex < line.length) {
+                currentLineText += line[charIndex];
+                textSpan.textContent = fullOutput + currentLineText;
+                charIndex++;
+                setTimeout(typeChar, 30);
+            } else {
+                fullOutput += currentLineText + "\n";
+                textSpan.textContent = fullOutput;
+                if (callback) setTimeout(callback, 300);
+            }
+        }
+        typeChar();
+    }
+
+    function typeLoading(callback) {
+        typeLine("Server loading...", () => {
+            typeLine("Server load successful", callback);
+        });
+    }
+
+    function typeConnectingToServer(callback) {
+        typeLine("Connecting to server...", () => {
+            typeLine("Connection successful", callback);
+        });
+    }
+
+    function typeLoadingDatabase(callback) {
+        typeLine("Database loading...", () => {
+            typeLine("Database load successful", callback);
+        });
+    }
+
+    function typeMainframe(callback) {
+        typeLine("Mainframe loading...", () => {
+            typeLine("Mainframe load successful", callback);
+        });
+    }
+
+    function typePressAnyButton(callback) {
+        typeLine("Press any button to continue...", () => {
+            if (callback) callback();
+        });
+    }
+
+    function typeGameIntroduction(callback){
+        const introText = "\tMain reactor status: core damaged, high radiation leak, !DANGER NUCLEAR MELTDOWN IMMINENT!\n" +
+                          "\tBackup reactor status: system in working order\n" +
+                          "\tMain defence system status: no status\n" +
+                          "\tArk's main bridge status: no status, control redirected\n" +
+                          "\tMain deck status: no problems detected or reported\n" +
+                          "\tLife support system status: !OXYGEN RECUPERATION SYSTEM FAILING!, !WATER RECUPERATION SYSTEM FAILING!, food system in working order\n" +
+                          "\tShield defence system status: system restored, system in working order\n" +
+                          "\tLiving quarters status: no problems detected or reported\n" +
+                          "\tSecondary defence system status: system in working order\n\n"+
+                          "Updating task log...\n\n"+
+                          "Press any button to continue...";
+        typeLine("Welcome to ExoCore Systems...",() => {
+            typeLine("Ark terminal loading...\nExplosion detected on top of Ark", () => {
+                typeLine("Ark damage system report:", () => {
+                    typeLine(introText, callback);
+                });
+            });
+        });
+    }
+
+    function taskLogCreation(){
+        const taskButton = document.createElement('button');
+        taskButton.id = 'taskLogButton';
+        taskButton.textContent = 'Task Log';
+        document.body.appendChild(taskButton);
+
+        const overlay = document.createElement('div');
+        overlay.id = 'taskOverlay';
+        const overlayContent = document.createElement('div');
+        overlayContent.id = 'taskOverlayContent';
+        const closeButton = document.createElement('button');
+        closeButton.id = 'taskOverlayClose';
+        closeButton.innerHTML = '&times;';
+        const title = document.createElement('h2');
+        title.textContent = 'Current Tasks';
+        const taskListUl = document.createElement('ul');
+        const tasks = [ // Úkoly by se měly aktualizovat dynamicky
+            "Investigate main reactor meltdown potential solutions.",
+            "Restore oxygen recuperation system functionality.",
+            "Restore water recuperation system functionality.",
+            "Investigate the cause of the explosion."
+        ];
+        // Funkce pro aktualizaci task listu v overlayi
+        window.updateTaskLogOverlay = (newTasks) => {
+            taskListUl.innerHTML = ''; // Vyčistí staré tasky
+            newTasks.forEach(taskText => {
+                const listItem = document.createElement('li');
+                listItem.textContent = taskText;
+                taskListUl.appendChild(listItem);
+            });
+        };
+        updateTaskLogOverlay(tasks); // Počáteční naplnění
+
+        overlayContent.appendChild(closeButton);
+        overlayContent.appendChild(title);
+        overlayContent.appendChild(taskListUl);
+        overlay.appendChild(overlayContent);
+        document.body.appendChild(overlay);
+
+        taskButton.addEventListener('click', () => { overlay.style.display = 'flex'; });
+        closeButton.addEventListener('click', () => { overlay.style.display = 'none'; });
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) { overlay.style.display = 'none'; }
+        });
+    }
+
+    function displayComputerRoomChoices(onPathChosenCallback) {
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesContainer';
+
+        const options = [
+            { text: "1. Main Reactor", action: pathMainReactor, pathName: "Main Reactor" },
+            { text: "2. Oxygen Recuperation Center", action: pathOxygenCenter, pathName: "Oxygen Recuperation Center" },
+            { text: "3. Water Recuperation Center", action: pathWaterCenter, pathName: "Water Recuperation Center" }
+        ];
+
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option';
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";           
+                opt.action(); 
+                if (onPathChosenCallback) onPathChosenCallback(opt.pathName);
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+    
+    // --- OPRAVENÉ A NOVÉ FUNKCE PRO MAIN REACTOR PATH ---
+
+    function MainReactorPath01() { // Voláno z pathMainReactor
+        typeLine("On the way to the main reactor room, you find a discarded HAZMAT suit.\nIt looks mostly intact. The air is thick with an acrid smell.", () => {
+            typeLine("Do you take the HAZMAT suit?", () => {
+                displayHazmatChoice();
+            });
+        });
+    }
+
+    function displayHazmatChoice() {
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesHazmat'; // Může být i 'choicesContainer', pokud nechcete specifické styly
+
+        const options = [
+            {
+                text: "1. Yes, take the HAZMAT suit.",
+                action: function() {
+                    HAZMASuit = true;
+                    console.log("HAZMAT suit taken: " + HAZMASuit); // Pro ladění
+                    handleHazmatChoice(true);
+                }
+            },
+            {
+                text: "2. No, leave it.",
+                action: function() {
+                    HAZMASuit = false; // Explicitně necháme/nastavíme na false
+                    console.log("HAZMAT suit taken: " + HAZMASuit); // Pro ladění
+                    handleHazmatChoice(false);
+                }
+            }
+        ];
+
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+
+    function handleHazmatChoice(tookSuit) {
+        if (tookSuit) {
+            typeLine("You quickly take the HAZMAT suit. It feels cumbersome but offers a sense of security against the invisible threat of radiation.", () => { proceedToReactorRoom();
+            });
+        } else {
+            typeLine("You decide to leave the suit. It might be contaminated, or perhaps speed is more important.", () => {
+                typeLine("You take a deep breath of the metallic air and press on.", () => {
+                    proceedToReactorRoom();
+                });
+            });
+        }
+    }
+
+    function proceedToReactorRoom() {
+        typeLine("\nYou continue towards the Main Reactor control room...", () => {
+            if (HAZMASuit) {
+                typeLine("The Geiger counter on your suit's wrist display starts clicking rapidly as you approach the heavy blast doors.", () => {
+                    MainReactorPath_WithSuit_02();
+                });
+            } else {
+                typeLine("A wave of heat and a prickling sensation on your skin intensify as you near the reactor chamber. Your vision swims slightly.", () => {
+                    MainReactorPath_NoSuit_02();
+                });
+            }
+        });
+    }
+
+    function MainReactorPath_WithSuit_02() {
+        typeLine("You feel somewhat protected by the suit. The massive blast door to the control room is sealed tight.", () => {
+            typeLine("A small, damaged access panel is nearby. It seems to be the only way in.", () => {
+                MainReactorPath_ControlPanel_03();
+            });
+        });
+    }
+    function MainReactorPath_ControlPanel_03(){
+        typeLine("You approach the panel and you try to use it to open the blast door." ,() =>{
+            typeLine("Due to it's damaged display, the panel does not responds to your touch. You have to find a someone with clearance to override the lock.",()=>{
+                typeLine("What will you do?",()=>{
+                    MainReactorPath_ControlPanelWheretoGo_04();
+                });
+
+            });
+        });
+    }
+    function MainReactorPath_ControlPanelWheretoGo_04(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesHazmat'; // Může být i 'choicesContainer', pokud nechcete specifické styly
+
+        const options = [
+            {
+                text: "1.Try your badge",
+                action: function() {
+                    MainReactorPath_ControlPanelWheretoGoOwnBadge_04();
+                }
+            },
+            {
+                text: "2.Go look on the main brige",
+                action: function() {
+                    MainReactorPath_ControlPanelWheretoGoMainBrige_04();
+                }
+            },
+            {
+                text: "3.Go look on to the second brige",
+                action: function() {
+                    MainReactorPath_ControlPanelWheretoGoSecBrige_04();
+                }
+            }
+        ];
+
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+
+    }
+    function MainReactorPath_ControlPanelWheretoGoOwnBadge_04(){
+        if(ownBadgeNuclearClearance)
+        {
+            typeLine("Thanks to your previous encounter your badge have a nuclear reactor clearance and you succesfully enter.",()=>{
+                MainReactorPath_ControlRoom_05();
+            });
+                
+        }
+        else if(!ownBadgeNuclearClearance)
+        {
+            typeLine("Unfortunetly, you do not have nuclear reactor clearance and you cannot enter. Try looking elsewhere.",()=>{
+                MainReactorPath_ControlPanelWheretoGo_04();
+            });
+        }
+    }
+    function MainReactorPath_ControlPanelWheretoGoMainBrige_04(){
+        if(!wentToMainBrige)
+        {
+            typeLine("On your way to the main brige you find traces of a fight that took place here.",()=>{
+            typeLine("You see dead bodys of Ark's security teams and dead bodys with unknow symbols on their armor.",()=>{
+                typeLine("As you come to the entrance to the main brige you find the door sealed.",()=>{
+                    typeLine("When you look thrue them you see the main brige was completly destroyed by the explosion. There is nothing left.",()=>{
+                        MainReactorPath_MainBrigeBack_04();
+                    });
+                });
+            });
+        });
+        }
+        else{
+            typeLine("There is nothing new there.\nWhat will you do?",()=>{
+                MainReactorPath_ControlPanelWheretoGO_04();
+            });
+        }
+    }
+    function chanceToMeetNuclearChiefF(){
+     let chance = Math.floor(Math.random()*10);
+     if(chance>1)
+     {
+         chanceToNuclearChief = 0;
+     }
+     else
+     {
+         chanceToNuclearChief = 1;
+     }
+     // Už nevoláme MainReactorPath_MainBrigeBack_04() tady,
+     // protože už jsme v této funkci.
+ }
+
+ function MainReactorPath_MainBrigeBack_04(){
+    if (chanceToNuclearChief == -1) {
+        chanceToMeetNuclearChiefF();
+        MainReactorPath_MainBrigeBack_04(); // ← DŮLEŽITÉ: znovu spustit po aktualizaci
+        return;
+    }
+    if (chanceToNuclearChief == 1) {
+        typeLine("On your way back you find a body of a nuclear chief", () => {
+            typeLine("You quickly loot his body and find a nuclear reactor badge.", () => {
+                badgeWithNuclearClearance = true;
+                typeLine("You run back and enter the main nuclear reactor control room.", () => {
+                    MainReactorPath_ControlRoom_05();
+                });
+            });
+        });
+    } else if (chanceToNuclearChief == 0) {
+        typeLine("You return to the control panel. What will you do?", () => {
+            MainReactorPath_ControlPanelWheretoGo_04();
+        });
+    }
+}
+
+    function MainReactorPath_ControlPanelWheretoGoSecBrige_04(){
+        typeLine("You run to the second brige and find it in chaos.",()=>{
+            typeLine("Chief Mate:Are you comming from the main reactor? Did you stop the meltdown?",()=>{
+                typeLine("What will you say?:",()=>{
+                    MainReactorPath_SecondBrigeSave();
+                }); 
+            });
+        });
+    }
+    function MainReactorPath_END(){
+        if(meltdownimminent)
+        {
+            typeLine("Chief Mate: You are telling a lie. Shot him.",()=>{
+                typeLine("GAME OVER:You got shot. They didn't know if you were lying or halucinating.",()=>{
+                    gameOver();
+                });
+            });
+        }
+        else if(!meltdownimminent){
+            typeLine("Chief Mate: Great job. Here is something for your trouble.",()=>{
+                typeLine("You reacive a weapon's room badge.",()=>{
+                    weaponRoomBadge = true;
+                    if(oxygenUp && waterUp)
+                    {
+                        gameEnd();
+                    }
+                    else if(!oxygenUp && !waterUp)
+                    {
+                        typeLine("Where will you go next?",()=>{
+                            whereToGoNuclearBoth();
+                        });
+                    }
+                    else if(!oxygenUp && waterUp)
+                    {
+                        pathOxygenCenter();
+                    }
+                    else if(oxygenUp && !waterUp)
+                    {
+                        pathWaterCenter();
+                    }
+                });
+            });
+        }
+    }
+    function whereToGoNuclearBoth(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choicesContainer';
+
+        const options = [
+            { text: "1. Oxygen Recuperation Center", action: pathOxygenCenter, pathName: "Oxygen Recuperation Center" },
+            { text: "2. Water Recuperation Center", action: pathWaterCenter, pathName: "Water Recuperation Center" }
+        ];
+
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option';
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";           
+                opt.action(); 
+                if (onPathChosenCallback) onPathChosenCallback(opt.pathName);
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+    
+    function gameEnd(){
+        typeLine("WIP",()=>{
+
+        });
+    }
+    function MainReactorPath_SecondBrigeSave(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choice-option';
+        const options = [
+            {
+                text: "1.No, I do not have proper clearance",
+                action: function() {
+                    typeLine("Chief Mate:No problem.\nHe reaches over and gives you a badge. You waste no time and rush to the control room",()=>{
+                        MainReactorPath_ControlRoom_05();
+                    })
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            },
+            {
+                text: "3.Yes, I did",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            }
+        ];
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }
+
+    function MainReactorPath_getShot(){
+        typeLine("Before you even finished the sentance you got shot.",()=>{
+            typeLine("GAME OVER:Was it really a great idea?",()=>{
+                gameOver();
+            })
+        })
+    }
+    function MainReactorPath_ControlRoom_05() {
+    typeLine("You enter the control room. The radiation levels are high, but manageable with the suit.", () => {
+        typeLine("The central console is active, awaiting input. Stop the reactor using the emergency rods.", () => {
+            typeLine("The system asks for a 3-digit override code. You have only 3 attempts.\nYou look around the room and find a half burned piece of paper.\nOn it there are three numbers. The first one is clearly a 7 but the other two are unreadable.\nThe second is either 2 or 8 nad the third is either 6 or 8.\nYou look again around the room and find number 2 sprayed on the chair.", () => {
+                startReactorPuzzle();
+            });
+        });
+    });
+}
+
+function startReactorPuzzle() {
+    const correctCode = "726";
+    let attemptsLeft = 3;
+
+    function askForCode() {
+        const inputContainer = document.createElement("div");
+        inputContainer.id = "codeInputContainer";
+
+        const inputField = document.createElement("input");
+        inputField.type = "text";
+        inputField.maxLength = 3;
+        inputField.placeholder = "Enter 3-digit code";
+        inputField.style.backgroundColor = "black";
+        inputField.style.color = "rgb(0, 255, 0)";
+        inputField.style.border = "1px solid rgb(0, 255, 0)";
+        inputField.style.fontFamily = '"Consolas", monospace';
+        inputField.style.fontSize = "16px";
+        inputField.style.padding = "5px";
+        inputField.style.marginTop = "10px";
+
+        const submitButton = document.createElement("button");
+        submitButton.textContent = "Submit";
+        submitButton.className = "startButton";
+        submitButton.style.marginLeft = "10px";
+
+        inputContainer.appendChild(inputField);
+        inputContainer.appendChild(submitButton);
+        outputDiv.appendChild(inputContainer);
+
+        submitButton.onclick = () => {
+            const userCode = inputField.value;
+            outputDiv.removeChild(inputContainer);
+            if (userCode === correctCode) {
+                typeLine("Code accepted. Emergency rods deployed. Reactor shutdown.", () => {
+                    meltdownimminent = false;
+                    MainReactorPath_ReturnToSecondBrige_05();
+                    
+                });
+            } else {
+                attemptsLeft--;
+                if (attemptsLeft > 0) {
+                    typeLine(`Incorrect code. Attempts left: ${attemptsLeft}`, askForCode);
+                } else {
+                    typeLine("All attempts used. Reactor lockdown engaged. Critical failure imminent.", () => {
+                        typeLine("GAME OVER:Nuclear explosion shreded Ark to pieces. Better luck next time",()=>{
+                            gameOver()
+                        });
+                    });
+                }
+            }
+        };
+    }
+
+    askForCode();
+}
+    function MainReactorPath_ReturnToSecondBrige_05(){
+        typeLine("You run to the second brige. It's in chaos.",()=>{
+            typeLine("Chief Mate:Did you stop the meltdow??",()=>{
+                typeLine("What will you say?:",()=>{
+                    MainReactorPath_ReturnToSecondBrigeChose_05();
+                });
+            });
+        });
+    }
+    function MainReactorPath_ReturnToSecondBrigeChose_05(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choice-option';
+        const options = [
+            {
+                text: "1.Yes, I did",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            },
+            {
+                text: "2.EVERYBODY HANDS UP!",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            }
+        ]    
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);
+    }    
+    function gameOver()
+    {
+        typeLine("\nPress any key to restart...", () => {
+                            const restartListener = () => {
+                                document.removeEventListener("keydown", restartListener);
+                                window.location.reload();
+                            };
+                            document.addEventListener("keydown", restartListener);
+                        });
+    }
+    function MainReactorPath_NoSuit_02() {
+        typeLine("The radiation is becoming unbearable. Each breath is a struggle. Your limbs feel heavy.", () => {
+            typeLine("Warning! Critical radiation exposure detected! Evacuate immediately!", () => {
+                typeLine("Your vision blurs... darkness encroaches...", () => {
+                    typeLine("GAME OVER: You have succumbed to acute radiation poisoning.", () => {
+                        typeLine("\nPress any key to restart...", () => {
+                            const restartListener = () => {
+                                document.removeEventListener("keydown", restartListener);
+                                window.location.reload();
+                            };
+                            document.addEventListener("keydown", restartListener);
+                        });
+                    });
+                });
+            });
+        });
+    }
+    
+    function pathMainReactor() { // Voláno z displayComputerRoomChoices
+        typeLine("Navigating to Main Reactor sector...", () => { // Mírná úprava textu
+            typeLine("The systems indicate this path leads directly towards the primary reactor core.", () => {
+                typeLine("AI Voice: Warning. Multiple radiation alerts active in Main Reactor sector. Unprotected exposure is extremely hazardous.", () => {
+                    MainReactorPath01(); // Začátek scénáře s HAZMAT oblekem
+                });
+            });
+        });
+    }
+    
+    function pathOxygenCenter() {
+        typeLine("Navigating to Oxygen Recuperation Center...", () => {
+            typeLine("You've chosen to go to the Oxygen Recuperation Center.", () => {
+                typeLine("The air feels thin. Emergency lights flicker. Alarms blare in the distance.", () => {
+                    // Logika pro Oxygen Center
+                     typeLine("TO BE CONTINUED: Oxygen Recuperation Center...", () => {});
+                });
+            });
+        });
+    }
+
+    function pathWaterCenter() {
+        typeLine("Navigating to Water Recuperation Center...", () => {
+            typeLine("You've chosen to go to the Water Recuperation Center.", () => {
+                typeLine("The sound of rushing water and steam fills the corridor. The floor is slick.", () => {
+                    // Logika pro Water Center
+                    if(weaponRoomBadge)
+                    {
+                        typeLine("As you run to Water Recuperation center. You see a weapon room. You are lucky and have the badge.\nWhen you inside you find one pistol.\nIt's P-150C. You take it and a second magazine just in case.",()=>{
+                        weapon =true;
+                        pathWaterCenter_01();
+                        });
+                    }
+                    else
+                    {
+                        pathWaterCenter_01();
+                    }
+                });
+            });
+        });
+    }
+
+    function pathWaterCenter_01() {
+            typeLine("When you run there, you notice the air is cooler and more humid.",()=>{
+                typeLine("The sound of rushing water grows louder as you approach the center.",()=>{
+                    typeLine("You arrive at the Water Recuperation Center. It's dimly lit, with large tanks filled with water.",()=>{
+                        typeLine("You look around and find the control panel of the recuperation system.",()=>{
+                            typeLine("You find that there is no water coming in and there is a on 1/3 of the power.",()=>{
+                                typeLine("You need to find a way to restore the water recuperation system.",()=>{
+                                    updateTaskLogOverlay([
+                                        "Investigate main reactor meltdown potential solutions.",
+                                        "Restore oxygen recuperation system functionality.",
+                                        "Restore water recuperation system functionality:",
+                                        "\t1.Restore water flow.",
+                                        "\t2.Restore power to the system.",
+                                        "Investigate the cause of the explosion."
+                                    ]);
+                                    typeLine("What will you do?",()=>{
+                                        pathWaterCenter_Decision_02();
+                                    })
+                                });
+                            });
+                            
+                        });
+                    });
+                });
+            });
+    }
+
+    function pathWaterCenter_Decision_02(){
+        if (cursorSpan) cursorSpan.style.display = 'none';
+
+        const choicesContainer = document.createElement('div');
+        choicesContainer.id = 'choice-option';
+        const options = [
+            {
+                text: "1.Look for a way to restore water flow.",
+                action: function() {
+                    MainReactorPath_END();
+                }
+            },
+            {
+                text: "2.Look for a way to restore power.",
+                action: function() {
+                    MainReactorPath_getShot();
+                }
+            }
+        ]    
+        options.forEach(opt => {
+            const choiceElement = document.createElement('div');
+            choiceElement.textContent = opt.text;
+            choiceElement.className = 'choice-option'; 
+            choiceElement.onclick = () => {
+                if (outputDiv.contains(choicesContainer)) {
+                    outputDiv.removeChild(choicesContainer);
+                }
+                if (cursorSpan) cursorSpan.style.display = 'inline';
+                textSpan.textContent = ""; 
+                fullOutput = "";
+                if (opt.action) {
+                    opt.action(); 
+                }
+            };
+            choicesContainer.appendChild(choiceElement);
+        });
+        outputDiv.appendChild(choicesContainer);  
+    }
+
+    function pathWaterCenter_Water_03(){
+        
+    }
+
+    function pathWaterCenter_Power_03(){
+
+    }
+
+    function whereToGoComputerRoom(callback) {
+        typeLine("\nSYSTEM: You are in the Computer Room. Main navigation online.", () => { 
+            typeLine("Corridors branch out from here. Available routes:", () => { // Upravený text
+                displayComputerRoomChoices(callback);
+            });
+        }); 
+    }
+    // --- KONEC DEFINIC FUNKCÍ ---
+
+    // Spuštění celého procesu
+    typeLoading(() => {
+        typeConnectingToServer(() => {
+            typeLoadingDatabase(() => {
+                typeMainframe(() => {
+                    typePressAnyButton(() => { 
+                        const onKeyPressForIntro = (event) => {
+                            document.removeEventListener("keydown", onKeyPressForIntro);
+                            outputDiv.style.transition = "opacity 1s ease";
+                            outputDiv.style.opacity = "0";
+                            setTimeout(() => {
+                                textSpan.textContent = "";
+                                fullOutput = ""; 
+                                outputDiv.style.transition = "none";
+                                outputDiv.style.opacity = "1";
+                                typeGameIntroduction(() => { 
+                                    console.log("Game introduction finished.");
+                                    taskLogCreation(); 
+                                    const onKeyPressForComputerRoom = (event) => {
+                                        document.removeEventListener("keydown", onKeyPressForComputerRoom);
+                                        textSpan.textContent = "";
+                                        fullOutput = "";
+                                        whereToGoComputerRoom((chosenPath) => { 
+                                            console.log("Path chosen: " + chosenPath + ". Game continues...");
+                                        });
+                                    };
+                                    document.addEventListener("keydown", onKeyPressForComputerRoom);
+                                });
+                            }, 1000);
+                        };
+                        document.addEventListener("keydown", onKeyPressForIntro);
+                    });
+                });
+            });
+        });
+    });
+}
+
+</script>
+</head>
+<body>
+    <div class="center">
+        <button id="startButton" class="startButton" onclick="gameStart()">Start the game</button>
+    </div>
+    <div id="output"></div>
+</body>
+</html>
