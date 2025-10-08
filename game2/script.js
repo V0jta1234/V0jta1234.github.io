@@ -601,11 +601,11 @@ function cropPlanets() {
 
 function handleCropPlanetsFirstChoice(choice) {
     switch (choice) {
-        case "1"://dodělat
+        case "1"://hotovo
             nextFunction = "cropPlanetsForce";
             screenClear();
             break;
-        case "2"://dodělat
+        case "2"://hotovo
             nextFunction = "cropPlanetsBlockade";
             screenClear();
             break;
@@ -623,7 +623,47 @@ function handleCropPlanetsFirstChoice(choice) {
 
 function cropPlanetsForce() {
     typeLine("You chose to take the crop planets by force.", () => {
-        typeLine
+        typeLine("They are protected only by a small rebel fleet made mostly of frigathes and one destroyer.", () => {
+            typeLine("Your fleet easily defeats the rebel forces and regains control over the crop planets.", () => {
+                typeLine("Losses:\n\t - 1x Destroyer\n\t - 1000x Fighters", () => {
+                    destroyers -= 1;
+                    fighters -= 1000;
+                    securedCropPlanets = true;
+                    taskLogUpdate();
+                });
+            });
+        });
+    });
+}
+
+function cropPlanetsBlockade() {
+    startedBlockade = true;
+    typeLine("You chose to start a blockade to cut off supplies to the rest of the rebels in the system.", () => {
+        typeLine("The blockade is on for several weeks, during which the rest of the rebels in the system are unable to resupply their forces.", () => {
+            typeLine("After several weeks, the rebels on the crop planets surrender due to lack of supplies.", () => {
+                typeLine("You have successfully regained control over the crop planets without any losses.", () => {
+                    securedCropPlanets = true;
+                    taskLogUpdate();
+                });
+            });
+        });
+    });
+}
+
+function cropPlanetsDestroy() {
+    typeLine("You chose to destroy the crop planets.", () => {
+        typeLine("This is a drastic measure.",()=>{
+            typeLine("You begin by orbital bombardment of the crop planets using the nuclear torpedoes. The planets are devastated and rendered uninhabitable.", () => {
+                typeLine("Unlike you, the rebels cannot supply from outside the system. On the planets in the system still occupied by the rebels, there are mass starvations.", () => {
+                    typeLine("Losses:\n\t - 1000x Bombers\n\t - 2000x Fighters", () => {
+                        destroyedCropPlanets = true;
+                        bombers -= 1000;
+                        fighters -= 2000;
+                        taskLogUpdate();
+                    });
+                });
+            });    
+        });
     });
 }
 
