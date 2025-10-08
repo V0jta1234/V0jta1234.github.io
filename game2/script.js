@@ -9,6 +9,13 @@ let bombers = 7000;
 let groundDivisions = 100;
 let spaceKnightsBrigades = 2;
 
+let destroyedKX42A = false;
+let securedKX42A = false;
+let securedHiveCities = false;
+let securedCropPlanets = false;
+let securedReasourcePlanets = false;
+let destroyedRebelFleet = false;
+
 function typeLine(line, callback) {
     let charIndex = 0;
     let currentLineText = "";
@@ -134,7 +141,7 @@ function taskLogCreation(){
         taskListUl.innerHTML = ''; // Vyčistí staré tasky
         newTasks.forEach(taskText => {
             const listItem = document.createElement('li');
-            listItem.textContent = taskText;
+            listItem.innerHTML = taskText; // Použij innerHTML pro podporu HTML tagů
             taskListUl.appendChild(listItem);
         });
     };
@@ -231,33 +238,180 @@ function firstActionDecision() {
 //7.10-tady sem skončil
 function handleFirstActionChoice(choice) {
     switch (choice) {
-        case "1":
-            typeLine("You chose to secure the main planet KX-42A.", () => {
-                nextFunction = "planetKX42A";
-                screenClear();
-            });
+        case "1"://dodělat - rozpravovánno
+            nextFunction = "planetKX42A";
+            screenClear();
             break;
-        case "2":
-            typeLine("You chose to attack the main rebel fleet.", () => {
-                nextFunction = "rebelFleet";
-                screenClear();
-            });
+        case "2"://dodělat
+            nextFunction = "rebelFleet";
+            screenClear();
             break;
-        case "3":
-            typeLine("You chose to regain control of the crop planets.", () => {
-                nextFunction = "cropPlanets";
-                screenClear();
-            });
+        case "3"://dodělat
+            nextFunction = "cropPlanets";
+            screenClear();
             break;
-        case "4":
-            typeLine("You chose to regain control of the hive cities.", () => {
-                nextFunction = "hiveCities";
-                screenClear();
-            });
+        case "4"://dodělat
+            nextFunction = "hiveCities";
+            screenClear();
             break;
         default:
             typeLine("Invalid choice.", () => {
                 firstActionDecision();
+            });
+    }
+}
+
+function planetKX42A() {
+    typeLine("You chose to secure the main planet KX-42A.", () => {
+        typeLine("This planet is the political and economic center of the KX-42 system.", () => {
+            typeLine("It is currently under rebel control, and retaking it will be a significant challenge.", () => {
+                typeLine("The planet is protected by orbital defense system and a small rebel fleet.", () => {
+                    typeLine("To destroy the orbital defense system, you will have to destroy the shield generators first.\nThey are located on the surface of the planet.", () => {
+                        planetKX42A_decision();
+                    });
+                });    
+            });  
+        });
+    });
+}
+
+function planetKX42A_decision() {
+    typeLine("What will you do, Admiral?", () => {
+        typeLine("1. Dispatch 2 divisions to the surface", () => {
+            typeLine("2. Dispatch 1 brigade of the Space Knights", () => {
+                typeLine("3. Try to overwhelm the shield generators with orbital bombardment and attacks from the ships's guns.", () => {
+                    typeLine("4. Blowup the planet using the railgun on the flagship", () => {
+                        typeLine("Please enter the number of your choice:", () => {
+                            // Přidání event listeneru na klávesu
+                            function onKeyDown(event) {
+                                const choice = event.key;
+                                if (["1", "2", "3", "4"].includes(choice)) {
+                                    window.removeEventListener("keydown", onKeyDown);
+                                    handlePlanetKX42AFirstChoice(choice);
+                                }
+                            }
+                            window.addEventListener("keydown", onKeyDown);
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
+function handlePlanetKX42AFirstChoice(choice) {
+    switch (choice) {
+        case "1"://dodělat
+            nextFunction = "planetKX42A_divisions";
+            screenClear();
+            break;
+        case "2"://dodělat
+            nextFunction = "planetKX42A_spaceKnights";
+            screenClear();
+            break;
+        case "3"://dodělat
+            nextFunction = "planetKX42A_bombardment";
+            screenClear();
+            break;
+        case "4"://dodělat
+            nextFunction = "planetKX42A_destruction";
+            screenClear();
+            break;
+        default:
+            typeLine("Invalid choice.", () => {
+                firstActionDecision();
+            });
+    }               
+}
+
+function planetKX42A_destruction() {
+    typeLine("You chose to destroy the planet using the railgun on the flagship.", () => {
+        typeLine("This is a drastic measure, but it will eliminate the rebel threat on the planet once and for all.", () => {
+            typeLine("The railgun fires a massive projectile that impacts the planet's surface, causing a catastrophic explosion.", () => {
+                typeLine("The explosion is visible from space, and the planet is split into many pieces.", () => {
+                    typeLine("You have successfully eliminated the rebel presence on KX-42A.", () => {
+                        destroyedKX42A = true;
+                        // Dynamická aktualizace tasklogu podle podmínek
+                        const tasks = [];
+                        tasks.push("Secure order in solar system");
+                        if (!destroyedKX42A && !securedKX42A) {
+                            tasks.push("Regain control over the main planet(KX-42A)");
+                        } else if (destroyedKX42A || securedKX42A) {
+                            tasks.push("<s>Regain control over the main planet(KX-42A)</s>");
+                        }
+                        if (!securedReasourcePlanets) {
+                            tasks.push("Reestablish mining operations on all resource-rich planets");
+                        }
+                        else{
+                            tasks.push("<s>Reestablish mining operations on all resource-rich planets</s>");
+                        }
+                        if (!destroyedRebelFleet) {
+                            tasks.push("Destroy the rebels");
+                        }
+                        else
+                        {
+                            tasks.push("<s>Destroy the rebels</s>");
+                        }
+                        updateTaskLogOverlay(tasks);
+                        nextFunction = "main_decision";
+                        screenClear();
+                    });
+                });
+            });
+        });
+    });
+}
+
+function main_decision(){
+    var main_decision = [];
+    if(!destroyedKX42A&& !securedKX42A) main_decision.push("1.Regain control over the main planet(KX-42A)");
+    if(!destroyedRebelFleet) main_decision.push("2.Eliminate the remaining rebel fleet");
+    if(!securedHiveCities) main_decision.push("3.Secure the hive cities");
+    if(!securedCropPlanets) main_decision.push("4.Secure the crop planets");
+    if(securedCropPlanets && destroyedRebelFleet && (securedKX42A || destroyedKX42A)&&securedHiveCities) main_decision.push("5.Secure the resource planets");
+    typeLine("What is your next action, Admiral?", () => {
+        main_decision.forEach((decision, index) => {
+            typeLine(`${decision}`, () => {
+                if (index === main_decision.length - 1) {
+                    function onKeyDown(event) {
+                                const choice = event.key;
+                                if (["1", "2", "3", "4", "5"].includes(choice)) {
+                                    window.removeEventListener("keydown", onKeyDown);
+                                    handleFirstActionChoice(choice);
+                                }
+                    }
+                    window.addEventListener("keydown", onKeyDown);
+                }
+            });
+        });
+    });
+}
+
+function handleMainDecision(decision) {
+    switch(decision){
+        case "1"&&(!destroyedKX42A || !securedKX42A):
+            nextFunction = "planetKX42A";
+            screenClear();
+            break;
+        case "2"&&(!destroyedRebelFleet):
+            nextFunction = "rebelFleet";
+            screenClear();
+            break;
+        case "3"&&(!securedHiveCities):
+            nextFunction = "hiveCities";
+            screenClear();
+            break;
+        case "4"&&(!securedCropPlanets):
+            nextFunction = "cropPlanets";
+            screenClear();
+            break;
+        case "5"&&(!securedResourcePlanets):
+            nextFunction = "resourcePlanets";
+            screenClear();
+            break;
+        default:
+            typeLine("Invalid choice.", () => {
+                main_decision();
             });
     }
 }
