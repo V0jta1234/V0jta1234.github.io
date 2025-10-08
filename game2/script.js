@@ -13,7 +13,9 @@ let destroyedKX42A = false;
 let securedKX42A = false;
 let securedHiveCities = false;
 let securedCropPlanets = false;
-let securedReasourcePlanets = false;
+let destroyedCropPlanets = false;
+let startedBlockade = false;
+let securedResourcePlanets = false;
 let destroyedRebelFleet = false;
 
 function typeLine(line, callback) {
@@ -193,6 +195,27 @@ function taskLogUpdate(){
     pressAnyToContinue();
 }
 
+function gameRestart(){
+    typeLine("What do you want to do?", () => {
+        typeLine("1. Start a new game", () => {
+            typeLine("2. Retreat with tail between your legs", () => {
+                typeLine("Please enter the number of your choice:", () => {
+                    // Přidání event listeneru na klávesu
+                    function onKeyDown(event) {
+                        const choice = event.key;
+                        if (choice === "1") {
+                            Location.reload();
+                        } else if (choice === "2") {
+                            window.close();
+                        }
+                    }
+                    onKeyDown();
+                });
+            });
+        });
+    });
+}
+
 function fleetStatus() {
     typeLine("Fleet status:", () => {
         typeLine("\tAll ships are in full working order", () => {
@@ -276,7 +299,7 @@ function handleFirstActionChoice(choice) {
             nextFunction = "planetKX42A";
             screenClear();
             break;
-        case "2"://dodělat
+        case "2"://hotovo - dokončeno 8.10.
             nextFunction = "rebelFleet";
             screenClear();
             break;
@@ -482,13 +505,135 @@ function planetKX42A_destruction() {
     });
 }
 
+function rebelFleet() {
+    var randomNumber = Math.random(0,11);
+    typeLine("You chose to attack the main rebel fleet at the outskirts of the system.", () => {
+        typeLine("The main rebel fleet consists of several battlecruisers, destroyers, and a large number of fighters.", () => {
+            if(randomNumber != 1){
+                if(randomNumber <= 4){
+                    if(battlecruisers>=2 && destroyers>=4&& fighters>=3000 && battleships>=1){
+                        typeLine("Your fleet engages the rebel fleet in a fierce battle.", () => {
+                            typeLine("Thanks to your superior numbers and technology, you are able to decisively defeat the rebel fleet.", () => {
+                                typeLine("Losses:\n\t - 2x Battlecruisers\n\t - 4x Destroyers\n\t - 2500x Fighters", () => {
+                                    battlecruisers -= 2;
+                                    destroyers -= 4;
+                                    fighters -= 2500;
+                                    destroyedRebelFleet = true;
+                                    taskLogUpdate();
+                                });
+                            });
+                        });    
+                    }
+                    else{
+                        typeLine("Your fleet is outnumbered and outgunned. You die in the fire of the battleship", () => {
+                            typeLine("GAME OVER", () => {
+                                nextFunction = "gameRestart";
+                                pressAnyToContinue();
+                            });
+                        });
+                    }
+                }
+                else{
+                    if(battlecruisers>=5 && destroyers>=8&& fighters>=5000 && battleships>=1){
+                    typeLine("Your fleet engages the rebel fleet in a fierce battle.", () => {
+                        typeLine("Thanks to your superior numbers and technology, you are able to decisively defeat the rebel fleet.", () => {
+                            typeLine("Losses:\n\t - 3x Battlecruisers\n\t - 5x Destroyers\n\t - 4500 Fighters", () => {
+                                battlecruisers -= 3;
+                                destroyers -= 5;
+                                fighters -= 4500;
+                                destroyedRebelFleet = true;
+                                taskLogUpdate();
+                            });
+                        });
+                    });    
+                }
+                else{
+                    typeLine("Your fleet is outnumbered and outgunned. You die in the fire of the battleship", () => {
+                        typeLine("GAME OVER", () => {
+                            nextFunction = "gameRestart";
+                            pressAnyToContinue();
+                        });
+                    });
+                }
+                }
+            }
+            else if(randomNumber == 1){
+                typeLine("The rebel fleet ambushes your fleet and destroys it.", () => {
+                    typeLine("You are captured in escape pod, taken before rebel trial and sentenced to death.", () => {
+                        typeLine("GAME OVER", () => {
+                            nextFunction = "gameRestart";
+                            pressAnyToContinue();
+                        });
+                    });
+                });
+            }
+        });
+    });
+}
+
+function cropPlanets() {
+    typeLine("You chose to regain control of the crop planets.", () => {
+        typeLine("The crop planets are vital to the KX-42 system's food supply.", () => {
+            typeLine("Without them the system will face severe food shortages.", () => {
+                typeLine("What will you do, Admiral?", () => {
+                    typeLine("1. Take the planets by force", () => {
+                        typeLine("2. Start a blockade to cut off supplies to the rest of the rebels in the system", () => {
+                            typeLine("3. Destroy the planets", () => {
+                                typeLine("Please enter the number of your choice:", () => {
+                                    // Přidání event listeneru na klávesu
+                                    function onKeyDown(event) {
+                                        const choice = event.key;
+                                        if (["1", "2", "3"].includes(choice)) {
+                                            window.removeEventListener("keydown", onKeyDown);
+                                            handleCropPlanetsFirstChoice(choice);
+                                        }
+                                    }
+                                    window.addEventListener("keydown", onKeyDown);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
+function handleCropPlanetsFirstChoice(choice) {
+    switch (choice) {
+        case "1"://dodělat
+            nextFunction = "cropPlanetsForce";
+            screenClear();
+            break;
+        case "2"://dodělat
+            nextFunction = "cropPlanetsBlockade";
+            screenClear();
+            break;
+        case "3"://dodělat
+            nextFunction = "cropPlanetsDestroy";
+            screenClear();
+            break;
+        default:
+            typeLine("Invalid choice.", () => {
+                nextFunction = "cropPlanets";
+                pressAnyToContinue();
+            });
+    }
+}
+
+function cropPlanetsForce() {
+    typeLine("You chose to take the crop planets by force.", () => {
+        typeLine
+    });
+}
+
 function main_decision(){
     var main_decision = [];
     if(!destroyedKX42A&& !securedKX42A) main_decision.push("1.Regain control over the main planet(KX-42A)");
     if(!destroyedRebelFleet) main_decision.push("2.Eliminate the remaining rebel fleet");
     if(!securedHiveCities) main_decision.push("3.Secure the hive cities");
-    if(!securedCropPlanets) main_decision.push("4.Secure the crop planets");
-    if(securedCropPlanets && destroyedRebelFleet && (securedKX42A || destroyedKX42A)&&securedHiveCities) main_decision.push("5.Secure the resource planets");
+    if(!securedCropPlanets&&!destroyedCropPlanets) main_decision.push("4.Secure the crop planets");
+    if((securedCropPlanets || destroyedCropPlanets) && destroyedRebelFleet && (securedKX42A || destroyedKX42A)&&securedHiveCities) main_decision.push("5.Secure the resource planets");
     typeLine("What is your next action, Admiral?", () => {
         main_decision.forEach((decision, index) => {
             typeLine(`${decision}`, () => {
@@ -521,7 +666,7 @@ function handleMainDecision(decision) {
             nextFunction = "hiveCities";
             screenClear();
             break;
-        case "4"&&(!securedCropPlanets):
+        case "4"&&(!securedCropPlanets || !destroyedCropPlanets):
             nextFunction = "cropPlanets";
             screenClear();
             break;
