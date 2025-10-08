@@ -303,11 +303,11 @@ function handleFirstActionChoice(choice) {
             nextFunction = "rebelFleet";
             screenClear();
             break;
-        case "3"://dodělat
+        case "3"://hotovo - dokončeno 8.10.
             nextFunction = "cropPlanets";
             screenClear();
             break;
-        case "4"://dodělat
+        case "4"://hotovo - dokončeno 8.10.
             nextFunction = "hiveCities";
             screenClear();
             break;
@@ -609,7 +609,7 @@ function handleCropPlanetsFirstChoice(choice) {
             nextFunction = "cropPlanetsBlockade";
             screenClear();
             break;
-        case "3"://dodělat
+        case "3"://hotovo
             nextFunction = "cropPlanetsDestroy";
             screenClear();
             break;
@@ -664,6 +664,58 @@ function cropPlanetsDestroy() {
                 });
             });    
         });
+    });
+}
+
+function hiveCities() {
+    typeLine("You chose to regain control of the hive cities.", () => {
+        if(startedBlockade)
+        {
+            typeLine("Due to the blockade, the hive cities had a shortage of supplies.", () => {
+                typeLine("When you arrive, you find the cities empty of life. Full of decaying corpses", () => {
+                    typeLine("You easily regain control over the hive cities with no losses.", () => {
+                        typeLine("The loss of workers will be a problem when reinstating the mining operations in the system.", () => {
+                            securedHiveCities = true;
+                            taskLogUpdate();
+                        });
+                    });
+                });
+            });
+        }
+        else if(destroyedCropPlanets)
+        {
+            typeLine("Due to the destruction of the crop planets, the hive cities had a shortage of supplies.", () => {
+                typeLine("About 80 million people died on each planet died due to the shortage.", () => {
+                    typeLine("You easily regain control over the hive cities with minimal losses.", () => {
+                        typeLine("Losses:\n\t - 10x Ground divisions", () => {
+                            groundDivisions -= 10;
+                            securedHiveCities = true;
+                            taskLogUpdate();
+                        });
+                    });
+                });
+            });
+        }
+        else
+        {
+            typeLine("The hive cities are heavily fortified and defended by a large rebel garrison.", () => {
+                typeLine("You launch a full-scale assault on the cities, using your ground divisions and Space Knights to lead the charge.", () => {
+                    typeLine("On some ocasions you have to burn whole levels of the cities or bombard parts of them. About 300 million civilians die due to these actions.", () => {
+                        typeLine("Althou you suffer heavy losses you eventualy regain controll over the cities.", () => {
+                            typeLine("Losses:\n\t - 30x Ground divisions\n\t - 1x Brigade of Space Knights\n\t - 3x Destroyers\n\t - 4000x Fighters\n\t - 3000x Bombers", () => {
+                                groundDivisions -= 30;
+                                spaceKnightsBrigades -= 1;
+                                destroyers -= 3;
+                                fighters -= 4000;
+                                bombers -= 3000;
+                                securedHiveCities = true;
+                                taskLogUpdate();
+                            });
+                        });
+                    });
+                });
+            });
+        }
     });
 }
 
