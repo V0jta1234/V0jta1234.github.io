@@ -6,7 +6,7 @@ let destroyers = 10;
 let battleships = 1;
 let fighters = 10000;
 let bombers = 7000;
-let groundDivisions = 100;
+let groundDivisions = 50;
 let spaceKnightsBrigades = 2;
 
 let destroyedKX42A = false;
@@ -71,6 +71,17 @@ function gameStart() {
             });
         });
     });
+}
+
+function pressAnyToContinue(){
+    typeLine("Press any button to continue...", () => {
+        // Přidání event listeneru na klávesu
+        function onKeyDown() {
+            screenClear();
+            window.removeEventListener("keydown", onKeyDown);
+        }
+        window.addEventListener("keydown", onKeyDown);
+        });
 }
 
 function screenClear() {
@@ -159,6 +170,29 @@ function taskLogCreation(){
         if (event.target === overlay) { overlay.style.display = 'none'; }
     });
 }
+function taskLogUpdate(){
+    const tasks = [];
+    tasks.push("Secure order in solar system");
+    if (!destroyedKX42A && !securedKX42A) {
+        tasks.push("Regain control over the main planet(KX-42A)");
+    } else if (destroyedKX42A || securedKX42A) {
+        tasks.push("<s>Regain control over the main planet(KX-42A)</s>");
+    }
+    if (!securedReasourcePlanets) {
+         tasks.push("Reestablish mining operations on all resource-rich planets");
+    } else {
+        tasks.push("<s>Reestablish mining operations on all resource-rich planets</s>");
+    }
+    if (!destroyedRebelFleet) {
+        tasks.push("Destroy the rebels");
+    } else {
+        tasks.push("<s>Destroy the rebels</s>");
+    }
+    updateTaskLogOverlay(tasks);
+    nextFunction = "main_decision";
+    pressAnyToContinue();
+}
+
 function fleetStatus() {
     typeLine("Fleet status:", () => {
         typeLine("\tAll ships are in full working order", () => {
@@ -170,7 +204,7 @@ function fleetStatus() {
                                 typeLine("\t\t - 1x Admiral-class Battleship", () => {
                                     typeLine("\t\t - 10000x Fighters", () => {
                                         typeLine("\t\t - 7000x Bombers", () => {
-                                            typeLine("\t\t - 100x Ground divisions", () => {
+                                            typeLine("\t\t - 50x Ground divisions", () => {
                                                 typeLine("\t\t - 2x Space knights brigades", () => {
                                                     typeLine("Press any button to continue...", () => { 
                                                         nextFunction = "solarSystemMap";
@@ -238,7 +272,7 @@ function firstActionDecision() {
 //7.10-tady sem skončil
 function handleFirstActionChoice(choice) {
     switch (choice) {
-        case "1"://dodělat - rozpravovánno
+        case "1"://hotovo - dokončeno 8.10.
             nextFunction = "planetKX42A";
             screenClear();
             break;
@@ -301,19 +335,19 @@ function planetKX42A_decision() {
 
 function handlePlanetKX42AFirstChoice(choice) {
     switch (choice) {
-        case "1"://dodělat
+        case "1"://hotovo
             nextFunction = "planetKX42A_divisions";
             screenClear();
             break;
-        case "2"://dodělat
+        case "2"://hotovo
             nextFunction = "planetKX42A_spaceKnights";
             screenClear();
             break;
-        case "3"://dodělat
+        case "3"://hotovo
             nextFunction = "planetKX42A_bombardment";
             screenClear();
             break;
-        case "4"://dodělat
+        case "4"://hotovo
             nextFunction = "planetKX42A_destruction";
             screenClear();
             break;
@@ -324,6 +358,115 @@ function handlePlanetKX42AFirstChoice(choice) {
     }               
 }
 
+function planetKX42A_divisions() {
+    var randomNumber = Math.random(0,11);
+    if (groundDivisions >= 2) {
+        typeLine("You chose to dispatch 2 divisions to the surface of KX-42A.", () => {
+            if (randomNumber != 1) {
+                typeLine("The divisions successfully land on the planet and begin their assault on the shield generators.", () => {
+                    nextFunction = "planetKX42A_divisions_success";
+                    pressAnyToContinue();
+                });
+            } else {
+                typeLine("The transport ships are destroyed by the orbital defense system before they can land.", () => {
+                    typeLine("You have lost 2 divisions.", () => {
+                        groundDivisions -= 2;
+                        nextFunction = "planetKX42A_decision";
+                        pressAnyToContinue();
+                    });
+                });
+            }
+        });
+    }
+    else{
+        typeLine("You do not have enough ground divisions to carry out this operation.", () => {
+            nextFunction = "planetKX42A_decision";
+            pressAnyToContinue();
+        });
+    }
+}
+
+function planetKX42A_divisions_success() {
+    typeLine("The divisions landed on the surface and began their assault on the shield generators.",() => {
+        typeLine("After a fierce battle, they successfully destroy the shield generators.", () => {
+            typeLine("With the shield generators destroyed, the orbital defense system is now vulnerable to attack.", () => {
+                typeLine("Your destroyers and battlecruisers took care of it and connected space stations. Your main force regained control over the planet.", () => {
+                    typeLine("Thanks to the number and technological superiority of your forces you took the planet with minimal losses.", () => {
+                        typeLine("Losses:\n\t - 3x Ground divisions\n\t -2x Destroyers", () => {
+                            groundDivisions -= 3;
+                            destroyers -= 2;
+                            securedKX42A = true;
+                            taskLogUpdate();
+                            
+                        });   
+                    });
+                });
+            });
+        });
+    });
+}
+
+function planetKX42A_spaceKnights() {
+    if (spaceKnightsBrigades >= 1) {
+        typeLine("You chose to dispatch 1 brigade of the Space Knights to the surface of KX-42A.", () => {
+            typeLine("The deployment shuttle is too fast for the orbital defense system to target it effectively.", () => {
+                typeLine("The brigade successfully lands on the planet and begins their assault on the shield generators.", () => {
+                    typeLine("Thanks to their superior training and equipment, the Space Knights are able to quickly destroy the shield generators.", () => {
+                        typeLine("With the shield generators destroyed, the orbital defense system is now vulnerable to attack.", () => {
+                            typeLine("Your destroyers and battlecruisers took care of it and connected space stations. Your main force regained control over the planet.", () => {
+                                typeLine("Thanks to the number and technological superiority of your forces you took the planet with minimal losses.", () => {
+                                    typeLine("Losses:\n\t - 2x Ground divisions\n\t -1x Destroyer", () => {
+                                        destroyers -= 1;
+                                        groundDivisions -= 2;
+                                        securedKX42A = true;
+                                        taskLogUpdate();
+
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+    else{
+        typeLine("You do not have enough Space Knights brigades to carry out this operation.", () => {
+            nextFunction = "planetKX42A_decision";
+           pressAnyToContinue();
+        });
+    }
+}
+
+function planetKX42A_bombardment(){
+    if(bombers>=3500)
+    {
+        typeLine("You chose to overwhelm the shield generators with orbital bombardment and attacks from the ships's guns.", () => {
+            typeLine("After a few hours of bombardment, the shield generators are destroyed.", () => {
+                typeLine("With the shield generators destroyed, the orbital defense system is now vulnerable to attack.", () => {
+                    typeLine("Your destroyers and battlecruisers took care of it and connected space stations. Your main force regained control over the planet.", () => {
+                        typeLine("You successfully took the planet, but suffered heavy losses in the process. The planet is also heavily damaged by the bombardment.", () => {
+                            typeLine("Losses:\n\t - 3500x Bombers\n\t - 3000x Fighters\n\t - 5x Destroyers\n\t - 1x Battlecruisers", () => {
+                                bombers -= 3500;
+                                fighters -= 3000;
+                                destroyers -= 5;
+                                battlecruisers -= 1;
+                                securedKX42A = true;
+                                taskLogUpdate();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }else{
+        typeLine("You do not have enough bombers to carry out this operation.", () => {
+            nextFunction = "planetKX42A_decision";
+           pressAnyToContinue();
+        });
+    }
+}
+
 function planetKX42A_destruction() {
     typeLine("You chose to destroy the planet using the railgun on the flagship.", () => {
         typeLine("This is a drastic measure, but it will eliminate the rebel threat on the planet once and for all.", () => {
@@ -331,30 +474,7 @@ function planetKX42A_destruction() {
                 typeLine("The explosion is visible from space, and the planet is split into many pieces.", () => {
                     typeLine("You have successfully eliminated the rebel presence on KX-42A.", () => {
                         destroyedKX42A = true;
-                        // Dynamická aktualizace tasklogu podle podmínek
-                        const tasks = [];
-                        tasks.push("Secure order in solar system");
-                        if (!destroyedKX42A && !securedKX42A) {
-                            tasks.push("Regain control over the main planet(KX-42A)");
-                        } else if (destroyedKX42A || securedKX42A) {
-                            tasks.push("<s>Regain control over the main planet(KX-42A)</s>");
-                        }
-                        if (!securedReasourcePlanets) {
-                            tasks.push("Reestablish mining operations on all resource-rich planets");
-                        }
-                        else{
-                            tasks.push("<s>Reestablish mining operations on all resource-rich planets</s>");
-                        }
-                        if (!destroyedRebelFleet) {
-                            tasks.push("Destroy the rebels");
-                        }
-                        else
-                        {
-                            tasks.push("<s>Destroy the rebels</s>");
-                        }
-                        updateTaskLogOverlay(tasks);
-                        nextFunction = "main_decision";
-                        screenClear();
+                        taskLogUpdate();
                     });
                 });
             });
