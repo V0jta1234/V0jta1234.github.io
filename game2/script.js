@@ -18,6 +18,8 @@ let startedBlockade = false;
 let securedResourcePlanets = false;
 let destroyedRebelFleet = false;
 
+let points = 0;
+
 function typeLine(line, callback) {
     let charIndex = 0;
     let currentLineText = "";
@@ -744,6 +746,29 @@ function main_decision(){
     });
 }
 
+function resourcePlanets() {
+    typeLine("After you finished all your tasks, you turn your attention to the resource planets.", () => {
+        typeLine("These planets are rich in iron and uranium, which are vital for ExoCore Systems' operations.", () => {
+            typeLine("You launch a series of mining operations on the resource planets, using your ground divisions to secure the mining sites and protect them from any potential rebel attacks.", () => {
+                if(startedBlockade){
+                    typeLine("Thanks to the blockade, there are almost no miners left and you ExoCore has to import workers from elsewhere.", () => {
+                    });
+                }
+                else if(destroyedCropPlanets){
+                    typeLine("Thanks to the destruction of the crop planets, almost half of the miners is gone. This only slows the operation down a little but still.", () => {
+                    });
+                }
+                else{
+                    typeLine("The mining operations are successful, and you are able to secure a steady supply of iron and uranium for ExoCore Systems.", () => {
+                    });
+                }
+                returnHome();
+            });
+        });
+    });
+}
+
+
 function handleMainDecision(decision) {
     switch(decision){
         case "1"&&(!destroyedKX42A || !securedKX42A):
@@ -770,5 +795,106 @@ function handleMainDecision(decision) {
             typeLine("Invalid choice.", () => {
                 main_decision();
             });
+    }
+}
+
+function returnHome() {
+    typeLine("With all tasks completed, you set course for ExoCore Systems headquarters. There you report on the mission and you are evaluated by the commanders.", () => {
+        if(destroyedCropPlanets){
+            points -= 10;
+        }
+        if(startedBlockade) points -= 50;
+        if(destroyedKX42A) points -= 10;
+        if(securedKX42A) points += 20;
+        if(securedCropPlanets) points += 10;
+        if(securedHiveCities) points += 10;
+
+        if(points >= 40){
+            typeLine("You have completed the mission with great success. You are rewarded with a position in the ExoCore System's Mining sub-division Command.", () => {
+                typeLine("WIN. 1/5 - The ExoCore Mining System Command", () => {
+                    nextFunction = "gameRestart";
+                    pressAnyToContinue();
+                });
+            });
+        }
+        else if(points >= 20){
+            typeLine("You have completed the mission successfully. You are rewarded with a promotion to a Super Admiral.", () => {
+                typeLine("WIN. 2/5 - Super Admiral", () => {
+                    nextFunction = "gameRestart";
+                    pressAnyToContinue();
+                });
+            });
+        }
+        else if(points >= 0){
+            typeLine("You have completed the mission, but with significant losses and collateral damage. But you still reinstagitated the mining operation. So you are given a next task.", () => {
+                typeLine("WIN. 3/5 - Admiral", () => {
+                    nextFunction = "gameRestart";
+                    pressAnyToContinue();
+                });
+            });
+        }
+        else if(points < 0){
+            if(destroyedKX42A){
+                typeLine("You are invited infront of the board of directors.", () => {});
+                if(startedBlockade){
+                    typeLine("Board Director:Even thou you caused great losses of life and the mining operations will not be reinstageted in near future, you acually saved the company a lot of money by destorying the main byrocratic centers of the sysetm.", () => {
+                        typeLine("Board Director: We offer you a promotion to the rank of Grand Admiral and possiton on this board. Do you accept?", () => {
+                            typeLine("1. Yes", () => {
+                                typeLine("2. No", () => {
+                                    typeLine("Please enter the number of your choice:", () => {
+                                    function onKeyDown(event) {
+                                        const choice = event.key;
+                                        if (["1", "2"].includes(choice)) {
+                                            window.removeEventListener("keydown", onKeyDown);
+                                            handleLastChoise(choice);
+                                        }
+                                    }
+                                    window.addEventListener("keydown", onKeyDown);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                }
+                else
+                {
+                    typeLine("For you great failures and losses, you are relieved of your command and sentenced to death.", () => {
+                    typeLine("GAME OVER. 4/5 - Death by firing squad", () => {
+                        nextFunction = "gameRestart";
+                        pressAnyToContinue();
+                    });
+                });
+                }
+            }
+            else{
+                typeLine("For you great failures and losses, you are relieved of your command and sentenced to death.", () => {
+                    typeLine("GAME OVER. 4/5 - Death by firing squad", () => {
+                        nextFunction = "gameRestart";
+                        pressAnyToContinue();
+                    });
+                });
+            }
+        }
+    });    
+}        
+
+function handleLastChoise(choice) {
+    switch(choise){
+        case "1":
+            typeLine("Board Director: Good choise.",() =>{
+                typeLine("You are promoted to the rank of Grand Admiral and granted a seat at the Board of Directors. Nobody ever questions the loss of billions of lives.",() =>{
+                    typeLine("WIN. 5/5 - For ExoCore!",()=>{
+                        nextFunction = "gameRestart";
+                        pressAnyToContinue();
+                    });
+                });
+            });
+        case "2":
+            typeLine("Board Director: Bad choise", () => {
+                    typeLine("GAME OVER. 4/5 - Death by firing squad", () => {
+                        nextFunction = "gameRestart";
+                        pressAnyToContinue();
+                    });
+                });    
     }
 }
