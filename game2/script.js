@@ -182,7 +182,7 @@ function taskLogUpdate(){
     } else if (destroyedKX42A || securedKX42A) {
         tasks.push("<s>Regain control over the main planet(KX-42A)</s>");
     }
-    if (!securedReasourcePlanets) {
+    if (!securedResourcePlanets) { // <-- opraveno
          tasks.push("Reestablish mining operations on all resource-rich planets");
     } else {
         tasks.push("<s>Reestablish mining operations on all resource-rich planets</s>");
