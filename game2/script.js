@@ -223,7 +223,7 @@ function fleetStatus() {
         typeLine("\tAll ships are in full working order", () => {
             typeLine("\tAll personnel awakened.", () => {
                 typeLine("\tAll weapons systems operational.", () => {
-                    typeLine("\tStreght overview:", () => {
+                    typeLine("\tStrength overview:", () => {
                         typeLine("\t\t - 5x Battlecruisers", () => {
                             typeLine("\t\t - 10x Destroyers", () => {
                                 typeLine("\t\t - 1x Admiral-class Battleship", () => {
@@ -736,7 +736,7 @@ function main_decision(){
                                 const choice = event.key;
                                 if (["1", "2", "3", "4", "5"].includes(choice)) {
                                     window.removeEventListener("keydown", onKeyDown);
-                                    handleFirstActionChoice(choice);
+                                    handleMainDecision(choice);
                                 }
                     }
                     window.addEventListener("keydown", onKeyDown);
@@ -771,25 +771,45 @@ function resourcePlanets() {
 
 function handleMainDecision(decision) {
     switch(decision){
-        case "1"&&(!destroyedKX42A || !securedKX42A):
-            nextFunction = "planetKX42A";
-            screenClear();
+        case "1":
+            if (!destroyedKX42A && !securedKX42A) {
+                nextFunction = "planetKX42A";
+                screenClear();
+            } else {
+                typeLine("Invalid choice.", () => { main_decision(); });
+            }
             break;
-        case "2"&&(!destroyedRebelFleet):
-            nextFunction = "rebelFleet";
-            screenClear();
+        case "2":
+            if (!destroyedRebelFleet) {
+                nextFunction = "rebelFleet";
+                screenClear();
+            } else {
+                typeLine("Invalid choice.", () => { main_decision(); });
+            }
             break;
-        case "3"&&(!securedHiveCities):
-            nextFunction = "hiveCities";
-            screenClear();
+        case "3":
+            if (!securedHiveCities) {
+                nextFunction = "hiveCities";
+                screenClear();
+            } else {
+                typeLine("Invalid choice.", () => { main_decision(); });
+            }
             break;
-        case "4"&&(!securedCropPlanets || !destroyedCropPlanets):
-            nextFunction = "cropPlanets";
-            screenClear();
+        case "4":
+            if (!securedCropPlanets && !destroyedCropPlanets) {
+                nextFunction = "cropPlanets";
+                screenClear();
+            } else {
+                typeLine("Invalid choice.", () => { main_decision(); });
+            }
             break;
-        case "5"&&(!securedResourcePlanets):
-            nextFunction = "resourcePlanets";
-            screenClear();
+        case "5":
+            if (!securedResourcePlanets) {
+                nextFunction = "resourcePlanets";
+                screenClear();
+            } else {
+                typeLine("Invalid choice.", () => { main_decision(); });
+            }
             break;
         default:
             typeLine("Invalid choice.", () => {
